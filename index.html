@@ -134,6 +134,29 @@
   a.btn{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;white-space:nowrap}
   .who-name{font-size:48px;line-height:.9;margin:24px 0 4px}
   .err{background:var(--deep);border-radius:20px;padding:24px 20px;font-size:16px;font-weight:500;line-height:1.5}
+
+  /* Responsive — DESIGN.md §8 collapsing strategy: 1-col <640 → 2-col tablet → 3-col desktop;
+     horizontal padding 16 → 24 → 48px; display type scales up; max content ~1440px. */
+  .card{display:flex;flex-direction:column}
+  .card .next{margin-top:auto}
+  @media (min-width:640px){
+    body{max-width:1440px}
+    .nav,.hero{padding-left:24px;padding-right:24px}
+    .stats,.cards,.tl{padding-left:24px;padding-right:24px}
+    .h1{padding-left:24px;padding-right:24px}
+    .actions{padding-left:24px;padding-right:24px;max-width:640px}
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .sheet{max-width:560px}
+  }
+  @media (min-width:1024px){
+    .nav,.hero,.stats,.cards,.tl,.h1,.actions{padding-left:48px;padding-right:48px}
+    .actions{max-width:736px}
+    .hero{padding-top:48px}
+    .hero h1{font-size:160px}
+    .cards{grid-template-columns:repeat(3,1fr)}
+    .tl.show{display:grid;grid-template-columns:repeat(2,1fr);column-gap:48px;align-items:start}
+    .tl .who-name{grid-column:1/-1}
+  }
 </style>
 </head>
 <body>
