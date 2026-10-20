@@ -80,6 +80,13 @@
   .next .v{font-size:16px;font-weight:500;line-height:1.5}
   .arrow{width:36px;height:36px;border-radius:50%;background:var(--white);color:var(--black);display:grid;place-items:center;font-size:18px;flex:none}
   .card.done h3,.card.done .pct{color:var(--grey-400)}
+  /* finished projects: own group, big green check */
+  .donehead{grid-column:1/-1;padding:32px 4px 4px;color:var(--success-inv)}
+  .card.fin{padding:16px 18px}
+  .finrow{display:flex;gap:14px;align-items:center}
+  .okc{width:44px;height:44px;border-radius:50%;background:var(--success-inv);color:#fff;display:grid;place-items:center;font-size:24px;font-weight:700;flex:none}
+  .card.fin h3{margin:0 0 2px;font-size:20px;color:var(--white)}
+  .card.fin .date{display:block;margin-top:4px}
   .empty{background:var(--deep);border-radius:20px;padding:32px 20px;text-align:center;color:var(--grey-400);font-size:16px;font-weight:500}
 
   /* timeline */
@@ -206,7 +213,7 @@ const arr = a => Array.isArray(a) ? a : [];
 // the board's free-text status → one of the three dashboard categories
 function category(p){
   const todo = arr(p.todo).length, wait = arr(p.wait).length, st = String(p.status||'');
-  if(!todo && !wait) return 'done';
+  if(p.finished || (!todo && !wait)) return 'done';
   if(/מחכ|ממתין|תקוע/.test(st)) return 'waiting';
   return 'active';
 }
@@ -251,7 +258,7 @@ function render(){
   $('#toggleView').textContent = view==='cards' ? 'מחכים ל…' : 'כרטיסים';
 
   $('#listCount').textContent = view==='cards' ? (list.length||'') : '';
-  $('#cards').innerHTML = list.length ? list.map(p=>{
+  const card = p=>{
     const cat = category(p), pr = progress(p), n = nextStep(p), who = waitWho(p);
     const steps = arr(p.done).length + arr(p.todo).length + arr(p.wait).length;
     return `<button class="card ${cat}" data-id="${esc(p.id)}">
@@ -260,7 +267,13 @@ function render(){
       ${p.sub?`<p class="desc">${esc(p.sub)}</p>`:''}
       <div class="prog"><span class="pct display">${pr}%</span><div class="bar"><i style="width:${pr}%"></i></div></div>
       <div class="next"><div><span class="k">${esc(n.k)} · ${arr(p.done).length}/${steps} בוצעו</span><span class="v">${esc(n.v)}</span></div><span class="arrow">←</span></div>
-    </button>`}).join('') : `<div class="empty">אין כאן פרויקטים</div>`;
+    </button>`};
+  const fin = p=>`<button class="card done fin" data-id="${esc(p.id)}"><div class="finrow"><span class="okc">✓</span><div>
+      <h3>${esc(p.name)}</h3>${p.sub?`<p class="desc">${esc(p.sub)}</p>`:''}${p.when?`<span class="date">${esc(p.when)}</span>`:''}</div></div></button>`;
+  const open = list.filter(p=>category(p)!=='done'), done = list.filter(p=>category(p)==='done');
+  $('#cards').innerHTML = list.length ? open.map(card).join('')
+    + (done.length ? `<h2 class="h1 donehead"><span>✓ סיימתי</span><small>${done.length}</small></h2>` + done.map(fin).join('') : '')
+    : `<div class="empty">אין כאן פרויקטים</div>`;
 
   // who-view: everything we're waiting on, grouped by person
   const by = {};
